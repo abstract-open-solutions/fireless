@@ -68,13 +68,13 @@ FBL.ns(function() {
                 var maxWidth = Firebug.sourceLinkLabelWidth;
                 if (maxWidth > 0)
                     fileName = cropString(fileName, maxWidth);
-                Components.utils.reportError(
-                    "Cropped: "+fileName);
+
+                // Components.utils.reportError("Cropped: "+fileName);
 
                 if(sourceLink.styleDebugInfo["line"]) {
-                    Components.utils.reportError(
-                        "About to render: "+fileName+"@"+
-                            sourceLink.styleDebugInfo["line"]);
+                    // Components.utils.reportError(
+                    //     "About to render: "+fileName+"@"+
+                    //         sourceLink.styleDebugInfo["line"]);
                     return $STRF(
                         "Line",
                         [fileName, sourceLink.styleDebugInfo["line"]]);
@@ -83,7 +83,7 @@ FBL.ns(function() {
                     return fileName;
                 }
             }
-            Components.utils.reportError("Calling old implementation");
+            // Components.utils.reportError("Calling old implementation");
             return superGetSourceLinkTitle.apply(this, [sourceLink]);
         };
 
