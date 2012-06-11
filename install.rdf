@@ -8,7 +8,7 @@
                    em:version="0.0.1"
                    em:creator="Simone Deponti"
                    em:description="FireLESS allows Firebug to display the original LESS filename and line number of LESS-generated CSS styles."
-                   em:homepageURL="http://github.com/simonedeponti/fireless"
+                   em:homepageURL="http://github.com/abstract-open-solutions/fireless"
                    em:iconURL="chrome://fireless/skin/logo.png">
     <em:targetApplication RDF:resource="rdf:#$NXdse3"/>
   </RDF:Description>
