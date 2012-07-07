@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="fireless@abstract.it"
                    em:name="FireLESS for Firebug"
-                   em:version="0.0.1"
+                   em:version="1.0"
                    em:creator="Simone Deponti"
                    em:description="FireLESS allows Firebug to display the original LESS filename and line number of LESS-generated CSS styles."
                    em:homepageURL="http://github.com/abstract-open-solutions/fireless"
@@ -15,5 +15,5 @@
   <RDF:Description RDF:about="rdf:#$NXdse3"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="6.0"
-                   em:maxVersion="12.*" />
+                   em:maxVersion="13.*" />
 </RDF:RDF>

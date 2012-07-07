@@ -1,42 +1,56 @@
 FBL.ns(function() {
     with (FBL) {
 
+        var log = Components.utils.reportError;
         var sl = Firebug.getRep(new FBL.SourceLink());
+
+        function parseRule(rule) {
+            var debugInfo = {};
+            for (var j=0; j<rule.cssRules.length; j++) {
+                var propValue = rule.cssRules[j].style.
+                    getPropertyValue("font-family");
+                var propName = rule.cssRules[j].selectorText;
+                var quoted = /^\'.*\'$/;
+                var dquoted = /^\".*\"$/;
+                if(quoted.test(propValue) || dquoted.test(propValue)) {
+                    propValue = propValue.substring(1, propValue.length-1);
+                }
+                debugInfo[propName] = propValue;
+            }
+            return debugInfo;
+        }
+
+        function parseRules(rules) {
+            var debugInfo = null;
+            for(var i=0; i<rules.length; i++) {
+                var rule = rules[i];
+                if(rule.type === CSSRule.MEDIA_RULE) {
+                    if(rule.media.mediaText === "-sass-debug-info") {
+                        debugInfo = parseRule(rule);
+                    }
+                }
+                else {
+                    if(rule.type === CSSRule.STYLE_RULE) {
+                        if(debugInfo) {
+                            rule.styleDebugInfo = debugInfo;
+                        }
+                    }
+                }
+            }
+        }
 
         function cacheStyleDebugInfo(sourceLink) {
             // Already cached
-            if (sourceLink.styleDebugInfo) { return; }
+            if(sourceLink.styleDebugInfo) { return; }
             // Not a CSS
-            if (sourceLink.type != "css") {
+            if(sourceLink.type != "css") {
                 sourceLink.styleDebugInfo = {};
                 return;
             }
 
-            var rules = sourceLink.object.parentStyleSheet.cssRules;
-            for(var i=0; i<rules.length-1; i++) {
-                var styleRule = rules[i+1];
-                if (styleRule.type != CSSRule.STYLE_RULE) continue;
-                styleRule.styleDebugInfo = {};
-
-                var mediaRule = rules[i];
-                if (mediaRule.type != CSSRule.MEDIA_RULE) continue;
-
-                if (mediaRule.media.mediaText != "-sass-debug-info") continue;
-
-                for (var j=0; j<mediaRule.cssRules.length; j++)
-                {
-                    var propValue = mediaRule.cssRules[j].style.
-                        getPropertyValue("font-family");
-                    var propName = mediaRule.cssRules[j].selectorText;
-                    var quoted = /^\'.*\'$/;
-                    var dquoted = /^\".*\"$/;
-                    if(quoted.test(propValue) || dquoted.test(propValue)) {
-                        propValue = propValue.substring(1, propValue.length-1);
-                    }
-                    styleRule.styleDebugInfo[propName] = propValue;
-                }
-            }
-
+            var stylesheet = sourceLink.object.parentStyleSheet;
+            var parent = sourceLink.object.parentRule || stylesheet;
+            parseRules(parent.cssRules);
             sourceLink.styleDebugInfo = sourceLink.object.styleDebugInfo || {};
             return;
         }
@@ -69,12 +83,7 @@ FBL.ns(function() {
                 if (maxWidth > 0)
                     fileName = cropString(fileName, maxWidth);
 
-                // Components.utils.reportError("Cropped: "+fileName);
-
                 if(sourceLink.styleDebugInfo["line"]) {
-                    // Components.utils.reportError(
-                    //     "About to render: "+fileName+"@"+
-                    //         sourceLink.styleDebugInfo["line"]);
                     return $STRF(
                         "Line",
                         [fileName, sourceLink.styleDebugInfo["line"]]);
@@ -83,7 +92,6 @@ FBL.ns(function() {
                     return fileName;
                 }
             }
-            // Components.utils.reportError("Calling old implementation");
             return superGetSourceLinkTitle.apply(this, [sourceLink]);
         };
 
@@ -125,6 +133,17 @@ FBL.ns(function() {
 
             lines.splice(10);
             return lines.join("") + "...";
+        };
+
+        var oldInspectObject = sl.inspectObject;
+        sl.inspectObject = function(sourceLink, context) {
+            var filename = sourceLink.styleDebugInfo["filename"];
+            if (filename) {
+                this.openInTab(sourceLink, context);
+                return true;
+            }
+            else
+                return oldInspectObject.call(this, sourceLink, context);
         };
     }
 });
