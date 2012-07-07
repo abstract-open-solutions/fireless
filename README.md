@@ -6,6 +6,9 @@ filenames and line numbers
 of LESS-generated CSS styles
 rather than those of the generated CSS.
 
+Currently requires a patched version of LESS available at
+https://github.com/simonedeponti/less.js
+
 ## Special thanks to
 
 This addon is is an adapted fork of
